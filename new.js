@@ -11,17 +11,22 @@ const K1 = 40;
 const incrementSpeed = 0.6;
 let horizontalOffset = 0;
 let A = 0, B = 0, C = 0;
-let angularVelA = 0, angularVelB = 0, angularVelC = 0;
 const cubeWidth = 20;
-const damping = 0.99;
+const damping = 0.998;
 let sinA = 0, cosA = 0, sinB = 0, cosB = 0, sinC = 0, cosC = 0;
 let lastMouseUpdateTime = Date.now();
 let lastTime = Date.now();
 let deltaMS = 0;
 let deltaTime = 0;
-const angVelFactor = 0.01;
+let lastMouseX = 0, lastMouseY = 0;
+let mouseX = 0, mouseY = 0;
 const FPS = 60;
-const TIME_TO_UPDATE_MOUSE = 1000 / FPS * 5;
+const TIME_TO_UPDATE_MOUSE = 1000 / FPS * 3;
+const DRAG_FACTOR = 0.2;
+const angVelFactor = DRAG_FACTOR * 0.01;
+let angularVelA = (Math.random() - 0.5) * 2 * angVelFactor;
+let angularVelB = (Math.random() - 0.5) * 2 * angVelFactor;
+let angularVelC = 0;
 const precomputeTrigonometry = () => {
     sinA = Math.sin(A);
     cosA = Math.cos(A);
@@ -32,7 +37,7 @@ const precomputeTrigonometry = () => {
 };
 const getCharacterForIntensity = (intensity) => {
     // 10 characters for 10 levels of light intensity
-    const CHARS = ' .:-=+*#%@';
+    const CHARS = ' .:=+*o%#@';
     const index = Math.floor(intensity * CHARS.length);
     return CHARS[index] || ' ';
 };
@@ -126,8 +131,6 @@ const main = async () => {
     updateDisplay();
 };
 const setupInteractiveMode = () => {
-    let lastMouseX = 0, lastMouseY = 0;
-    let mouseX = 0, mouseY = 0;
     keypress(process.stdin);
     process.stdin.setRawMode(true);
     process.stdin.resume();
@@ -150,8 +153,10 @@ const setupInteractiveMode = () => {
             case "mousedrag":
                 const deltaX = info.x - lastMouseX;
                 const deltaY = info.y - lastMouseY;
-                A -= deltaY * (Math.PI / 180) * 8;
-                B += deltaX * (Math.PI / 180) * 4;
+                A -= deltaY * (Math.PI / 180) * 8 * DRAG_FACTOR;
+                B += deltaX * (Math.PI / 180) * 4 * DRAG_FACTOR;
+                // angularVelA += deltaY * angVelFactor * DRAG_FACTOR;
+                // angularVelB += deltaX * angVelFactor * DRAG_FACTOR;
                 A = A % (Math.PI * 2);
                 B = B % (Math.PI * 2);
                 C = C % (Math.PI * 2);
@@ -160,15 +165,14 @@ const setupInteractiveMode = () => {
                 angularVelA = 0;
                 angularVelB = 0;
                 // angularVelC = 0;
-                lastMouseX = info.x;
-                lastMouseY = info.y;
+                // lastMouseX = info.x;
+                // lastMouseY = info.y;
                 break;
             case "mouseup":
                 const dx = mouseX - lastMouseX;
                 const dy = mouseY - lastMouseY;
-                angularVelA = dy * angVelFactor * deltaTime;
-                angularVelB = dx * angVelFactor * deltaTime;
-                // angularVelC = dx * angVelFactor * deltaTime;
+                angularVelA = dy * angVelFactor;
+                angularVelB = dx * angVelFactor;
                 break;
         }
     });
@@ -178,12 +182,18 @@ const setupInteractiveMode = () => {
         const timePerFrame = 1000 / FPS;
         deltaMS = currentTime - lastTime;
         deltaTime = deltaMS / timePerFrame;
-        A += angularVelA;
-        B += angularVelB;
-        C += angularVelC;
+        // A -= deltaY * (Math.PI / 180) * 8 * DRAG_FACTOR;
+        // B += deltaX * (Math.PI / 180) * 4 * DRAG_FACTOR;
+        // A = A % (Math.PI * 2);
+        // B = B % (Math.PI * 2);
+        // C = C % (Math.PI * 2);
+        A -= angularVelA * (Math.PI / 180) * 8 * 100;
+        B += angularVelB * (Math.PI / 180) * 4 * 100;
+        A = A % (Math.PI * 2);
+        B = B % (Math.PI * 2);
         angularVelA *= damping;
         angularVelB *= damping;
-        angularVelC *= damping;
+        // angularVelC *= damping;
         const timeSinceLastMouseUpdate = currentTime - lastMouseUpdateTime;
         if (timeSinceLastMouseUpdate > TIME_TO_UPDATE_MOUSE) {
             lastMouseX = mouseX;
