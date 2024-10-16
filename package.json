@@ -1,6 +1,6 @@
 {
   "name": "eloqube",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/runners/run-terminal.js",
   "license": "MIT",
   "bin": {
@@ -14,6 +14,5 @@
   },
   "dependencies": {
     "keypress": "^0.2.1"
-  },
-  "devDependencies": {}
+  }
 }
