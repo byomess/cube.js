@@ -3,7 +3,7 @@
 import { Eloqube } from '../core/eloqube';
 import { TerminalEloqube } from '../renderers/terminal';
 
-import CONFIG from '../../config.json';
+import CONFIG from '../config.json';
 
 const { FPS } = CONFIG;
 

@@ -3,7 +3,7 @@ import keypress from 'keypress';
 import { Eloqube } from '../core/eloqube';
 import { IKeyPress, IMousePress } from '../types';
 
-import CONFIG from '../../config.json';
+import CONFIG from '../config.json';
 
 const { WIDTH, HEIGHT, DRAG_FACTOR, DAMPING } = CONFIG;
 const ANG_VEL_FACTOR = DRAG_FACTOR * 0.01;

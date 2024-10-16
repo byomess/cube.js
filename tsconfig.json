@@ -16,7 +16,7 @@
       "resolveJsonModule": true,
       "allowJs": true
     },
-    "include": ["src/**/*.ts"],  // Ensure this includes all .ts files
+    "include": ["src/**/*.ts", "src/**/*.json"], 
     "exclude": ["node_modules"]
   }
   
