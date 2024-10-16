@@ -36,7 +36,8 @@ const precomputeTrigonometry = () => {
 };
 
 const getCharacterForIntensity = (intensity: number): string => {
-    const CHARS = ' .-:;=+*o%#@';
+    // 10 characters for 10 levels of light intensity
+    const CHARS = ' .:-=+*#%@';
     const index = Math.floor(intensity * CHARS.length);
     return CHARS[index] || ' ';
 };
