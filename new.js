@@ -1,5 +1,4 @@
 const keypress = require('keypress');
-
 const width = 100;
 const height = 40;
 const zBuffer = new Array(width * height).fill(0);
@@ -20,7 +19,7 @@ let lastMouseUpdateTime = Date.now();
 let lastTime = Date.now();
 let deltaMS = 0;
 let deltaTime = 0;
-const angVelFactor = 0.05;
+const angVelFactor = 0.01;
 const FPS = 60;
 const TIME_TO_UPDATE_MOUSE = 1000 / FPS * 5;
 const precomputeTrigonometry = () => {
@@ -32,7 +31,8 @@ const precomputeTrigonometry = () => {
     cosC = Math.cos(C);
 };
 const getCharacterForIntensity = (intensity) => {
-    const CHARS = ' .-:;=+*o%#@';
+    // 10 characters for 10 levels of light intensity
+    const CHARS = ' .:-=+*#%@';
     const index = Math.floor(intensity * CHARS.length);
     return CHARS[index] || ' ';
 };
@@ -99,12 +99,12 @@ const calculateForSurface = (cubeX, cubeY, cubeZ) => {
 const updateDisplay = () => {
     let output = "";
     for (let k = 0; k < width * height; k++) {
-        if (buffer[k] !== prevBuffer[k]) {
-            const row = Math.floor(k / width);
-            const col = k % width;
-            output += `\x1b[${row + 1};${col + 1}H${colorBuffer[k]}${buffer[k]}\x1b[0m`;
-            prevBuffer[k] = buffer[k];
-        }
+        // if (buffer[k] !== prevBuffer[k]) {
+        const row = Math.floor(k / width);
+        const col = k % width;
+        output += `\x1b[${row + 1};${col + 1}H${colorBuffer[k]}${buffer[k]}\x1b[0m`;
+        prevBuffer[k] = buffer[k];
+        // }
     }
     process.stdout.write(output);
 };
@@ -159,20 +159,20 @@ const setupInteractiveMode = () => {
             case "mousedown":
                 angularVelA = 0;
                 angularVelB = 0;
-                angularVelC = 0;
+                // angularVelC = 0;
                 lastMouseX = info.x;
                 lastMouseY = info.y;
                 break;
             case "mouseup":
                 const dx = mouseX - lastMouseX;
                 const dy = mouseY - lastMouseY;
-                angularVelA = dy * deltaTime * angVelFactor;
-                angularVelB = dx * deltaTime * angVelFactor;
-                angularVelC = dx * deltaTime * angVelFactor;
+                angularVelA = dy * angVelFactor * deltaTime;
+                angularVelB = dx * angVelFactor * deltaTime;
+                // angularVelC = dx * angVelFactor * deltaTime;
                 break;
         }
     });
-    process.stdout.write('\x1b[?1003h'); // Enable mouse tracking mode
+    process.stdout.write('\x1b[?1003h');
     setInterval(() => {
         const currentTime = Date.now();
         const timePerFrame = 1000 / FPS;
