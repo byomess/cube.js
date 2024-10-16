@@ -1,10 +1,10 @@
 {
   "name": "eloqube",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "main": "dist/runners/run-terminal.js",
   "license": "MIT",
   "bin": {
-    "terminal-eloqube": "dist/runners/run-terminal.js"
+    "eloqube": "dist/runners/run-terminal.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,5 +14,8 @@
   },
   "dependencies": {
     "keypress": "^0.2.1"
-  }
+  },
+  "files": [
+    "dist/**/*"
+  ]
 }
