@@ -13,8 +13,6 @@ export interface IMousePress {
 }
 
 export interface IEloqubeConfig {
-    WIDTH: number;
-    HEIGHT: number;
     CUBE_WIDTH: number;
     INCREMENT_SPEED: number;
     DRAG_FACTOR: number;

@@ -5,7 +5,7 @@ import { IKeyPress, IMousePress } from '../types';
 
 import CONFIG from '../config.json';
 
-const { WIDTH, HEIGHT, DRAG_FACTOR, DAMPING } = CONFIG;
+const { DRAG_FACTOR, DAMPING } = CONFIG;
 const ANG_VEL_FACTOR = DRAG_FACTOR * 0.01;
 
 export class TerminalEloqube {
@@ -19,7 +19,7 @@ export class TerminalEloqube {
 
     constructor(
         private eloqube: Eloqube,
-        private options: { fps: number }
+        private options: { fps: number, width: number, height: number, size: number }
     ) {
         this.eloqube.angularVelA = (Math.random() - 0.5) * 2 * ANG_VEL_FACTOR;
         this.eloqube.angularVelB = (Math.random() - 0.5) * 2 * ANG_VEL_FACTOR;
@@ -33,10 +33,7 @@ export class TerminalEloqube {
         process.stdin.resume();
 
         process.stdin.on('keypress', (_ch: string, key: IKeyPress) => {
-            if (key && key.ctrl && key.name === 'c') {
-                process.stdout.write('\x1b[?1003l');
-                process.exit();
-            }
+            this.handleKeyboardEvent(key);
         });
 
         process.stdin.on('mousepress', (info: IMousePress) => {
@@ -46,6 +43,42 @@ export class TerminalEloqube {
         process.stdout.write('\x1b[?1003h');
     }
 
+    private handleAcceleration(x: number, y: number) {
+        this.eloqube.angularVelA += y * (Math.PI / 180) * 4 * DRAG_FACTOR;
+        this.eloqube.angularVelB += x * (Math.PI / 180) * 2 * DRAG_FACTOR;
+        this.eloqube.angularVelA = this.eloqube.angularVelA % (Math.PI * 2);
+        this.eloqube.angularVelB = this.eloqube.angularVelB % (Math.PI * 2);
+    }
+
+    private applyContinousRotation(x: number, y: number) {
+        this.eloqube.angularVelA = y * ANG_VEL_FACTOR;
+        this.eloqube.angularVelB = x * ANG_VEL_FACTOR;
+    }
+
+    private handleKeyboardEvent(key: IKeyPress) {
+        if (key && key.ctrl && key.name === 'c') {
+            process.stdout.write('\x1b[?1003l');
+            process.exit();
+        }
+
+        const keys: { [key: string]: boolean } = {};
+
+        if (key && key.name === 'w') keys['w'] = true;
+        if (key && key.name === 'a') keys['a'] = true;
+        if (key && key.name === 's') keys['s'] = true;
+        if (key && key.name === 'd') keys['d'] = true;
+        if (key && key.name === 'q') keys['q'] = true;
+        if (key && key.name === 'e') keys['e'] = true;
+
+        const dx = (keys['a'] ? -1 : 0) + (keys['d'] ? 1 : 0);
+        const dy = (keys['w'] ? -1 : 0) + (keys['s'] ? 1 : 0);
+
+        if (keys['q']) this.eloqube.size -= 1;
+        if (keys['e']) this.eloqube.size += 1;
+
+        this.handleAcceleration(dx, dy);
+    }
+        
     private handleMouseEvent(info: IMousePress) {
         let event = '';
 
@@ -60,14 +93,7 @@ export class TerminalEloqube {
             case "mousedrag":
                 const deltaX = info.x - this.lastMouseX;
                 const deltaY = info.y - this.lastMouseY;
-
-                this.eloqube.A -= deltaY * (Math.PI / 180) * 8 * DRAG_FACTOR;
-                this.eloqube.B += deltaX * (Math.PI / 180) * 4 * DRAG_FACTOR;
-
-                this.eloqube.A = this.eloqube.A % (Math.PI * 2);
-                this.eloqube.B = this.eloqube.B % (Math.PI * 2);
-                this.eloqube.C = this.eloqube.C % (Math.PI * 2);
-
+                this.handleAcceleration(deltaX, deltaY);
                 break;
 
             case "mousedown":
@@ -78,9 +104,7 @@ export class TerminalEloqube {
             case "mouseup":
                 const dx = this.mouseX - this.lastMouseX;
                 const dy = this.mouseY - this.lastMouseY;
-
-                this.eloqube.angularVelA = dy * ANG_VEL_FACTOR;
-                this.eloqube.angularVelB = dx * ANG_VEL_FACTOR;
+                this.applyContinousRotation(dx, dy);
                 break;
         }
     }
@@ -104,9 +128,9 @@ export class TerminalEloqube {
 
         let output = "";
 
-        for (let k = 0; k < WIDTH * HEIGHT; k++) {
-            const row = Math.floor(k / WIDTH);
-            const col = k % WIDTH;
+        for (let k = 0; k < this.options.width * this.options.height; k++) {
+            const row = Math.floor(k / this.options.width);
+            const col = k % this.options.width;
             output += `\x1b[${row + 1};${col + 1}H${this.eloqube.getColorBuffer()[k]}${this.eloqube.getBuffer()[k]}\x1b[0m`;
         }
 

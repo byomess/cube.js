@@ -1,10 +1,10 @@
 import CONFIG from '../config.json';
 import { IEloqubeConfig } from '../types';
 
+const WIDTH = process.stdout.columns || 80;
+const HEIGHT = process.stdout.rows || 24
 
 const {
-    WIDTH,
-    HEIGHT,
     CUBE_WIDTH,
     INCREMENT_SPEED,
     DRAG_FACTOR,
@@ -25,6 +25,8 @@ export class Eloqube {
     public angularVelA = (Math.random() - 0.5) * 2 * ANG_VEL_FACTOR;
     public angularVelB = (Math.random() - 0.5) * 2 * ANG_VEL_FACTOR;
 
+    public size = K1;
+    
     private zBuffer: number[];
     private buffer: string[];
     private colorBuffer: string[];
@@ -36,10 +38,11 @@ export class Eloqube {
     private sinC = 0;
     private cosC = 0;
 
-    constructor() {
+    constructor(options: { size: number }) {
         this.zBuffer = new Array(WIDTH * HEIGHT).fill(0);
         this.buffer = new Array(WIDTH * HEIGHT).fill(BACKGROUND_CHAR);
         this.colorBuffer = new Array(WIDTH * HEIGHT).fill('');
+        this.size = options.size || K1;
     }
 
     private precomputeTrigonometry() {
@@ -97,8 +100,8 @@ export class Eloqube {
         const z = this.calculateFaceZ(cubeX, cubeY, cubeZ) + DISTANCE_FROM_CAM;
 
         const ooz = 1 / z;
-        const xp = Math.floor(WIDTH / 2 + K1 * ooz * x * 2);
-        const yp = Math.floor(HEIGHT / 2 + K1 * ooz * y);
+        const xp = Math.floor(WIDTH / 2 + this.size * ooz * x * 2);
+        const yp = Math.floor(HEIGHT / 2 + this.size * ooz * y);
         const idx = xp + yp * WIDTH;
 
         if (idx >= 0 && idx < WIDTH * HEIGHT && ooz > this.zBuffer[idx]) {

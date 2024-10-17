@@ -1,8 +1,6 @@
 {
-    "WIDTH": 100,
-    "HEIGHT": 40,
     "FPS": 60,
-    "DRAG_FACTOR": 0.2,
+    "DRAG_FACTOR": 0.01,
     "CUBE_WIDTH": 20,
     "DAMPING": 0.998,
     "DISTANCE_FROM_CAM": 100,

@@ -1,0 +1,17 @@
+
+usage: eloqube [options]
+
+Options:
+  --help                show this help message and exit
+  -v, --version         show program's version number and exit
+  -s, --size            size of the cube (default: terminal height / 2)
+  -w, --width           width of the cube as terminal columns (default: terminal width)
+  -h, --height          height of the cube as terminal rows (default: terminal height)
+  -f, --fps             frames per second (default: 60)
+
+Controls:
+  - Mouse drag / WASD / Arrows: rotate the cube
+  - q: decrease the size of the cube
+  - e: increase the size of the cube
+
+GitHub: https://github.com/byomess/eloqube

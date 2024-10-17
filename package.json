@@ -1,6 +1,6 @@
 {
   "name": "eloqube",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "dist/runners/run-terminal.js",
   "license": "MIT",
   "bin": {
@@ -10,7 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/runners/run-terminal.js",
     "run": "node dist/runners/run-terminal.js",
-    "build": "tsc"
+    "dev": "tsx src/runners/run-terminal.ts",
+    "build": "scripts/build.sh"
   },
   "dependencies": {
     "keypress": "^0.2.1"
