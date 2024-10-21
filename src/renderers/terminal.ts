@@ -5,8 +5,7 @@ import { IKeyPress, IMousePress } from '../types';
 
 import CONFIG from '../config.json';
 
-const { DRAG_FACTOR, DAMPING } = CONFIG;
-const ANG_VEL_FACTOR = DRAG_FACTOR * 0.01;
+const { ANG_VEL_FACTOR, DRAG_FACTOR, DAMPING } = CONFIG;
 
 export class TerminalEloqube {
     private lastMouseX = 0;
@@ -19,7 +18,7 @@ export class TerminalEloqube {
 
     constructor(
         private eloqube: Eloqube,
-        private options: { fps: number, width: number, height: number, size: number }
+        private options: { fps: number, width: number, height: number, distance: number }
     ) {
         this.eloqube.angularVelA = (Math.random() - 0.5) * 2 * ANG_VEL_FACTOR;
         this.eloqube.angularVelB = (Math.random() - 0.5) * 2 * ANG_VEL_FACTOR;
@@ -73,8 +72,8 @@ export class TerminalEloqube {
         const dx = (keys['a'] ? -1 : 0) + (keys['d'] ? 1 : 0);
         const dy = (keys['w'] ? -1 : 0) + (keys['s'] ? 1 : 0);
 
-        if (keys['q']) this.eloqube.size -= 1;
-        if (keys['e']) this.eloqube.size += 1;
+        if (keys['q']) this.eloqube.distance += 1;
+        if (keys['e']) this.eloqube.distance -= 1;
 
         this.handleAcceleration(dx, dy);
     }
@@ -91,8 +90,8 @@ export class TerminalEloqube {
 
         switch (event) {
             case "mousedrag":
-                const deltaX = info.x - this.lastMouseX;
-                const deltaY = info.y - this.lastMouseY;
+                const deltaX = this.mouseX - this.lastMouseX;
+                const deltaY = this.mouseY - this.lastMouseY;
                 this.handleAcceleration(deltaX, deltaY);
                 break;
 

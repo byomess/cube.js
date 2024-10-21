@@ -1,7 +1,8 @@
 {
     "FPS": 60,
     "DRAG_FACTOR": 0.01,
-    "CUBE_WIDTH": 40,
+    "ANG_VEL_FACTOR": 0.01,
+    "SIZE": 40,
     "DAMPING": 0.998,
     "DISTANCE_FROM_CAM": 100,
     "K1": 40,

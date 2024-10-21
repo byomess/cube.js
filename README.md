@@ -38,8 +38,9 @@ Eloqube comes with a `config.json` file that allows you to tweak several paramet
 - **WIDTH**: Width of the terminal output.
 - **HEIGHT**: Height of the terminal output.
 - **FPS**: Frames per second of the animation.
-- **CUBE_WIDTH**: Size of the cube.
+- **SIZE**: Size of the cube.
 - **DRAG_FACTOR**: Factor that influences how much the cube rotates when dragged.
+- **ANG_VEL_FACTOR**: Factor that influences how much angular velocity is applied when dragging is released.
 - **DAMPING**: Damping applied to angular velocity after release.
 - **INCREMENT_SPEED**: Precision of the cube's surface rendering.
 - **BACKGROUND_CHAR**: ASCII character for empty spaces.

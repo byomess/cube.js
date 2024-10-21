@@ -1,15 +1,10 @@
 import CONFIG from '../config.json';
 import { IEloqubeConfig } from '../types';
 
-const WIDTH = process.stdout.columns || 80;
-const HEIGHT = process.stdout.rows || 24
-
 const {
-    CUBE_WIDTH,
     INCREMENT_SPEED,
     DRAG_FACTOR,
     K1,
-    DISTANCE_FROM_CAM,
     CHARS,
     COLORS,
     BACKGROUND_CHAR
@@ -24,8 +19,6 @@ export class Eloqube {
 
     public angularVelA = (Math.random() - 0.5) * 2 * ANG_VEL_FACTOR;
     public angularVelB = (Math.random() - 0.5) * 2 * ANG_VEL_FACTOR;
-
-    public size = K1;
     
     private zBuffer: number[];
     private buffer: string[];
@@ -38,11 +31,15 @@ export class Eloqube {
     private sinC = 0;
     private cosC = 0;
 
-    constructor(options: { size: number }) {
-        this.zBuffer = new Array(WIDTH * HEIGHT).fill(0);
-        this.buffer = new Array(WIDTH * HEIGHT).fill(BACKGROUND_CHAR);
-        this.colorBuffer = new Array(WIDTH * HEIGHT).fill('');
-        this.size = options.size || K1;
+    constructor(
+        public width: number,
+        public height: number,
+        public size: number,
+        public distance: number
+    ) {
+        this.zBuffer = new Array(width * height).fill(0);
+        this.buffer = new Array(width * height).fill(BACKGROUND_CHAR);
+        this.colorBuffer = new Array(width * height).fill('');
     }
 
     private precomputeTrigonometry() {
@@ -78,12 +75,12 @@ export class Eloqube {
     }
 
     private calculateFaceNormal(cubeX: number, cubeY: number, cubeZ: number): [number, number, number, string] {
-        if (cubeZ === CUBE_WIDTH) return [0, 0, 1, 'front'];
-        if (cubeZ === -CUBE_WIDTH) return [0, 0, -1, 'back'];
-        if (cubeX === CUBE_WIDTH) return [1, 0, 0, 'right'];
-        if (cubeX === -CUBE_WIDTH) return [-1, 0, 0, 'left'];
-        if (cubeY === CUBE_WIDTH) return [0, 1, 0, 'top'];
-        if (cubeY === -CUBE_WIDTH) return [0, -1, 0, 'bottom'];
+        if (cubeZ === this.size) return [0, 0, 1, 'front'];
+        if (cubeZ === -this.size) return [0, 0, -1, 'back'];
+        if (cubeX === this.size) return [1, 0, 0, 'right'];
+        if (cubeX === -this.size) return [-1, 0, 0, 'left'];
+        if (cubeY === this.size) return [0, 1, 0, 'top'];
+        if (cubeY === -this.size) return [0, -1, 0, 'bottom'];
         return [0, 0, 0, ''];
     }
 
@@ -97,14 +94,14 @@ export class Eloqube {
     private calculateForSurface(cubeX: number, cubeY: number, cubeZ: number) {
         const x = this.calculateFaceX(cubeX, cubeY, cubeZ);
         const y = this.calculateFaceY(cubeX, cubeY, cubeZ);
-        const z = this.calculateFaceZ(cubeX, cubeY, cubeZ) + DISTANCE_FROM_CAM;
+        const z = this.calculateFaceZ(cubeX, cubeY, cubeZ) + this.distance;
 
         const ooz = 1 / z;
-        const xp = Math.floor(WIDTH / 2 + this.size * ooz * x * 2);
-        const yp = Math.floor(HEIGHT / 2 + this.size * ooz * y);
-        const idx = xp + yp * WIDTH;
+        const xp = Math.floor(this.width / 2 + K1 * ooz * x * 2);
+        const yp = Math.floor(this.height / 2 + K1 * ooz * y);
+        const idx = xp + yp * this.width;
 
-        if (idx >= 0 && idx < WIDTH * HEIGHT && ooz > this.zBuffer[idx]) {
+        if (idx >= 0 && idx < this.width * this.height && ooz > this.zBuffer[idx]) {
             this.zBuffer[idx] = ooz;
             let [nx, ny, nz, face] = this.calculateFaceNormal(cubeX, cubeY, cubeZ);
             [nx, ny, nz] = this.rotateNormal(nx, ny, nz);
@@ -126,14 +123,14 @@ export class Eloqube {
         this.zBuffer.fill(0);
         this.precomputeTrigonometry();
 
-        for (let cubeX = -CUBE_WIDTH; cubeX < CUBE_WIDTH; cubeX += INCREMENT_SPEED) {
-            for (let cubeY = -CUBE_WIDTH; cubeY < CUBE_WIDTH; cubeY += INCREMENT_SPEED) {
-                this.calculateForSurface(cubeX, cubeY, -CUBE_WIDTH);
-                this.calculateForSurface(CUBE_WIDTH, cubeY, cubeX);
-                this.calculateForSurface(-CUBE_WIDTH, cubeY, -cubeX);
-                this.calculateForSurface(-cubeX, cubeY, CUBE_WIDTH);
-                this.calculateForSurface(cubeX, -CUBE_WIDTH, -cubeY);
-                this.calculateForSurface(cubeX, CUBE_WIDTH, cubeY);
+        for (let cubeX = -this.size; cubeX < this.size; cubeX += INCREMENT_SPEED) {
+            for (let cubeY = -this.size; cubeY < this.size; cubeY += INCREMENT_SPEED) {
+                this.calculateForSurface(cubeX, cubeY, -this.size);
+                this.calculateForSurface(this.size, cubeY, cubeX);
+                this.calculateForSurface(-this.size, cubeY, -cubeX);
+                this.calculateForSurface(-cubeX, cubeY, this.size);
+                this.calculateForSurface(cubeX, -this.size, -cubeY);
+                this.calculateForSurface(cubeX, this.size, cubeY);
             }
         }
     }
