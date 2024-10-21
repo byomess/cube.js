@@ -1,6 +1,6 @@
 {
   "name": "eloqube",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "main": "dist/runners/run-terminal.js",
   "license": "MIT",
   "bin": {
@@ -18,5 +18,18 @@
   },
   "files": [
     "dist/**/*"
+  ],
+  "keywords": [
+    "eloqube",
+    "terminal",
+    "game",
+    "cli",
+    "interactive",
+    "animation",
+    "ascii",
+    "art",
+    "cube",
+    "rubik",
+    "3d"
   ]
 }
